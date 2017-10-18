@@ -138,6 +138,10 @@ class Crazyflie:
     def updateTarget(self, target):
         firm.plan_update_avoid_target(self.planner, arr2vec(target), self.time())
 
+    #distributed behavior
+    def boids(self, role, dst):
+      firm.plan_start_boids(self.planner, self.id, role, firm.mkvec(dst[0], dst[1], dst[2]), firm.get_cfstat_array())
+
     # query state
     def position(self):
         pos = self._vposition()
@@ -174,25 +178,37 @@ class Crazyflie:
     # "private" methods
     def _vposition(self):
         # TODO this should be implemented in C
-        if self.planner.state == firm.TRAJECTORY_STATE_IDLE:
+        if self.planner.state == firm.TRAJECTORY_STATE_IDLE:            
+            firm.update_cfstat_position(self.id, self.planner.lastKnownPosition.x, self.planner.lastKnownPosition.y, self.planner.lastKnownPosition.z, self.time())
+            firm.update_cfstat_velocity(self.id, 0, 0, 0, self.time())
             return self.planner.lastKnownPosition
         else:
             ev = firm.plan_current_goal(self.planner, self.time())
             self.planner.lastKnownPosition = firm.mkvec(ev.pos.x, ev.pos.y, ev.pos.z)
+            #print ev.pos.x,ev.pos.y,ev.pos.z,ev.vel.x, ev.vel.y, ev.vel.z
+            firm.update_cfstat_position(self.id, ev.pos.x, ev.pos.y, ev.pos.z, self.time())
+            firm.update_cfstat_velocity(self.id, ev.vel.x, ev.vel.y, ev.vel.z, self.time())
             # not totally sure why, but if we don't do this, we don't actually return by value
             return firm.mkvec(ev.pos.x, ev.pos.y, ev.pos.z)
 
 
 class CrazyflieServer:
+    #for boids
+    BOIDS_FOLLOWER = 0
+    BOIDS_LEADER = 1
+
     def __init__(self, timeHelper):
         with open("../launch/crazyflies.yaml", 'r') as ymlfile:
             cfg = yaml.load(ymlfile)
 
         self.crazyflies = []
         self.crazyfliesById = dict()
+        firm.init_cfstat_array()
         for crazyflie in cfg["crazyflies"]:
             id = int(crazyflie["id"])
             initialPosition = crazyflie["initialPosition"]
+            firm.update_cfstat_position(id, initialPosition[0], initialPosition[1], initialPosition[2], timeHelper.time())
+            firm.update_cfstat_velocity(id, 0, 0, 0, timeHelper.time())
             cf = Crazyflie(id, initialPosition, timeHelper)
             self.crazyflies.append(cf)
             self.crazyfliesById[id] = cf
@@ -231,3 +247,7 @@ class CrazyflieServer:
     def goHome(self, group = 0):
         for crazyflie in self.crazyflies:
             crazyflie.goHome(group)
+
+    def boids(self):
+        for crazyflie in self.crazyflies:
+            crazyflie.boids(self.BOIDS_FOLLOWER, [0, 0, 0])  

@@ -3,15 +3,19 @@
 #include "math3d.h"
 #include "pptraj.h"
 #include "avoidtarget.h"
+#include "boids.h"
 #include "planner.h"
 #include "packetdef.h"
+#include "cf_status.h"
 %}
 
 %include "math3d.h"
 %include "pptraj.h"
 %include "avoidtarget.h"
+%include "boids.h"
 %include "planner.h"
 %include "packetdef.h"
+%include "cf_status.h"
 
 %inline %{
 void poly4d_set(struct poly4d *poly, int dim, int coef, float val)
