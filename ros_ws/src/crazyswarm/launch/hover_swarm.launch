@@ -15,7 +15,7 @@
       # genericLogTopic_log1_Variables: ["ekfprof.usec_setup", "ekfprof.usec_innov", "ekfprof.usec_gain", "ekfprof.usec_corr", "ekfprof.usec_cov"]
       # genericLogTopic_log1_Variables: ["profiling.usec_ekf", "profiling.usec_traj", "profiling.usec_ctrl", "profiling.usec_idle"]
       # genericLogTopic_log1_Variables: ["stabilizer.x", "ctrltarget.x", "vicon.x", "stabilizer.z", "ctrltarget.z", "vicon.z"]
-      genericLogTopic_log1_Variables: ["stabilizer.yaw", "ctrltarget.yaw", "gyro.z", "vicon.yaw"] #, "stabilizer.x", "ctrltarget.x", "stabilizer.y", "ctrltarget.y"]
+      genericLogTopic_log1_Variables: ["stabilizer.x", "boids.leaderX", "stabilizer.y", "boids.leaderY","stabilizer.z", "boids.leaderZ"] #, "stabilizer.x", "ctrltarget.x", "stabilizer.y", "ctrltarget.y"]
       firmwareParams:
         flightmode:
           posCtrl: 1
@@ -57,7 +57,7 @@
       # optitrack_local_ip: "localhost"
       # optitrack_server_ip: "optitrack"
       save_point_clouds: ~/pointCloud.ot
-      interactive_object: active-wand # virtual #active-wand
+      # interactive_object: active-wand # virtual #active-wand
       numMarkerConfigurations: 1
       markerConfigurations:
         "0":
@@ -84,7 +84,7 @@
       write_csvs: False
       force_no_cache: False
       enable_parameters: True
-      enable_logging: False
+      enable_logging: True
     </rosparam>
   </node>
 
@@ -113,8 +113,10 @@
 
   <node pkg="rqt_gui" type="rqt_gui" name="rqt" args="--perspective-file $(find crazyswarm)/launch/rqt.perspective"/>
 
-  <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot_yaw" args="/cf47/log1/values[0] /cf47/log1/values[1] /cf47/log1/values[2] /cf47/log1/values[3]"/>
+  <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot_x" args="/cf5/log1/values[0] /cf5/log1/values[1]"/>
 
+  <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot_y" args="/cf5/log1/values[2] /cf5/log1/values[3]"/>
+  <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot_z" args="/cf5/log1/values[4] /cf5/log1/values[5]"/>
   <!-- <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot_x" args="/cf47/log1/values[2] /cf47/log1/values[3]"/> -->
 
 <!--   <node pkg="rqt_plot" type="rqt_plot" name="rqt_plot_y" args="/cf06/log1/values[3] /cf06/log1/values[4] /cf06/log1/values[5]"/>

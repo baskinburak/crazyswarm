@@ -57,8 +57,8 @@ class Crazyflie:
         self.landService = rospy.ServiceProxy(prefix + "/land", Land)
         rospy.wait_for_service(prefix + "/hover")
         self.hoverService = rospy.ServiceProxy(prefix + "/hover", Hover)
-				rospy.wait_for_service(prefix + "/boids")
-				self.boidsService = rospy.ServiceProxy(prefix + "/boids", Boids)
+        rospy.wait_for_service(prefix + "/boids")
+        self.boidsService = rospy.ServiceProxy(prefix + "/boids", Boids)
         rospy.wait_for_service(prefix + "/avoid_target")
         self.avoidTargetService = rospy.ServiceProxy(prefix + "/avoid_target", AvoidTarget)
         rospy.wait_for_service(prefix + "/set_group")
@@ -94,6 +94,7 @@ class Crazyflie:
         self.avoidTargetService(home, maxDisplacement, maxSpeed)
 
     def boids(self, role, dst):
+        dst = arrayToGeometryPoint(dst)
         self.boidsService(self.id, role, dst)
 
     def setGroup(self, group):
